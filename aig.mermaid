@@ -5,25 +5,35 @@ config:
 sequenceDiagram
     %% Define participants with aliases for cleaner labels
     participant C as Client
-    participant AIG as AIG
+    participant AIG as Auditable<br>Item<br>Graph
     participant DS as Datastore Connector
     participant DLT as DLT Connector
     autonumber
 
+    activate C
     %% Step 1: Client initiates
     C->>+AIG: createVertex(annotationObject)
+
+    activate AIG
+    AIG-->>-AIG: calculate changeset
     AIG->>+DS: set(vertex)
     DS-->>-AIG: created
 
-    AIG->>AIG: calculate<br>changeset
-
     par
-        AIG-->>C: Response (vertex created)
+        AIG-->>C: Response (vertexId)
+        deactivate C
     and
-        AIG->>AIG: calculate<br>proof
-        AIG->>+DLT: audit_trail.append(proof)
-        DLT-->>-AIG: receipt
-        AIG->>+DS: set(vertex, auditTrailId)
+        activate AIG
+        AIG-->>-AIG: calculate<br>proof
+        activate DLT
+        AIG->>DLT: AuditTrail.create()
+        DLT-->>-AIG: receipt(trailID)
+        activate DLT
+        AIG->>DLT: AuditTrail.append(trailID,proof)
+        DLT-->>-AIG: receipt(recordID)
+        activate AIG
+        AIG->>-AIG: addResource(type=AuditTrail, id=trailID)
+        AIG->>+DS: set(vertextId, vertex, auditTrailResource)
         DS-->>-AIG: updated
     end
     %% PARALLEL TASKS END HERE

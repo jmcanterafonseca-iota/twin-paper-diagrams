@@ -12,6 +12,7 @@ sequenceDiagram
     participant DLT as DLT Connector
     autonumber
 
+    activate C
     %% Step 1: Client initiates
     C->>+DM: createDocument(content, metadata)
     DM->>+AIG: createVertex(with metadata as annotationObject)
@@ -21,7 +22,7 @@ sequenceDiagram
     AIG->>+BS: storeObject(docContent)
     BS-->>AIG: stored
     deactivate BS
-    AIG-->>DM: added
+    AIG-->>DM: resource added
     deactivate AIG
     DM->>+DataExt: extract(content)
     DataExt->>DM: docData
@@ -29,10 +30,13 @@ sequenceDiagram
 
     par
         DM-->>C: Response (doc Id, doc data)
+        deactivate C
     and
-        DM->>DM: calculate<br>attestation
+        activate DM
+        DM-->>-DM: calculate<br>attestation
         DM->>+DLT: NFT.create(attestationMetadata)
         DLT-->>DM: receipt
+        deactivate DLT
         DM->>+AIG: addResource(vertexId, NFT Id)
         AIG-->>DM: added 
         deactivate AIG

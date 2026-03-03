@@ -1,0 +1,42 @@
+---
+config:
+  theme: default
+---
+sequenceDiagram
+    %% Define participants with aliases for cleaner labels
+    participant C as Client
+    participant DM as Document<br>Management
+    participant DataExt as Data Extraction
+    participant AIG as Auditable<br>Item<br>Graph
+    participant BS as Blobstore<br>Connector
+    participant DLT as DLT Connector
+    autonumber
+
+    %% Step 1: Client initiates
+    C->>+DM: createDocument(content, metadata)
+    DM->>+AIG: createVertex(with metadata as annotationObject)
+    AIG-->>DM: Response (vertexId)
+    deactivate AIG
+    DM->>+AIG: addResource(vertexId, docContent)
+    AIG->>+BS: storeObject(docContent)
+    BS-->>AIG: stored
+    deactivate BS
+    AIG-->>DM: added
+    deactivate AIG
+    DM->>+DataExt: extract(content)
+    DataExt->>DM: docData
+    deactivate DataExt
+
+    par
+        DM-->>C: Response (doc Id, doc data)
+    and
+        DM->>DM: calculate<br>attestation
+        DM->>+DLT: NFT.create(attestationMetadata)
+        DLT-->>DM: receipt
+        DM->>+AIG: addResource(vertexId, NFT Id)
+        AIG-->>DM: added 
+        deactivate AIG
+    end
+    %% PARALLEL TASKS END HERE
+    %% Manually deactivate AIG after all parallel tasks finish
+    deactivate DM

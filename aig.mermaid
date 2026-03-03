@@ -1,0 +1,31 @@
+---
+config:
+  theme: default
+---
+sequenceDiagram
+    %% Define participants with aliases for cleaner labels
+    participant C as Client
+    participant AIG as AIG
+    participant DS as Datastore Connector
+    participant DLT as DLT Connector
+    autonumber
+
+    %% Step 1: Client initiates
+    C->>+AIG: createVertex(annotationObject)
+    AIG->>+DS: set(vertex)
+    DS-->>-AIG: created
+
+    AIG->>AIG: calculate<br>changeset
+
+    par
+        AIG-->>C: Response (vertex created)
+    and
+        AIG->>AIG: calculate<br>proof
+        AIG->>+DLT: audit_trail.append(proof)
+        DLT-->>-AIG: receipt
+        AIG->>+DS: set(vertex, auditTrailId)
+        DS-->>-AIG: updated
+    end
+    %% PARALLEL TASKS END HERE
+    %% Manually deactivate AIG after all parallel tasks finish
+    deactivate AIG

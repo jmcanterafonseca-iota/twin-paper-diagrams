@@ -1,0 +1,39 @@
+---
+config:
+  theme: default
+---
+sequenceDiagram
+    %% Define participants with aliases for cleaner labels
+    participant ADP as TWIN Adaptor
+    participant DSC as DS Connector
+    participant DSApp as DS App
+    participant RM as Rights<br>Management
+    participant AIG as Auditable<br>Item<br>Graph
+
+    autonumber
+
+    activate ADP
+    activate DSC
+    ADP->>DSC: outbox(identity, AS_Activity)
+    activate DSC
+    DSC->>-DSC: verify
+    activate RM
+    DSC->>+RM: enforce
+    RM->>-RM: resolve attributes  
+    RM->>+RM: decide
+    RM-->>-DSC: pass
+    deactivate RM 
+    par
+        activate ADP
+        DSC-->>ADP: Accepted
+        deactivate ADP
+    and
+        DSC->>+DSApp: handleActivity
+        DSApp->>+AIG: createVertext(activity.object)
+        AIG-->>DSApp: created
+        deactivate AIG
+        DSApp-->>DSC: processed
+        deactivate DSApp
+   end
+
+deactivate DSC

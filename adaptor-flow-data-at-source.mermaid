@@ -4,7 +4,7 @@ config:
 ---
 sequenceDiagram
     %% Define participants with aliases for cleaner labels
-   box rgb(255, 204, 204)
+    box rgb(255, 204, 204)
         participant ADP as TWIN Adaptor
     end
     participant DSC as DS Connector
@@ -12,31 +12,28 @@ sequenceDiagram
         participant DSApp as DS App
     end
     participant RM as Rights<br>Management
-    participant AIG as Auditable<br>Item<br>Graph
-    
+    participant DM as Document<br>Management
 
     autonumber
 
     activate ADP
     activate DSC
-    ADP->>DSC: outbox(identity, <br>AS('Create', 'Consignment'))
+    ADP->>DSC: outbox(identity, <br>AS('Add', 'Document'))
     activate DSC
     DSC->>-DSC: verify
-    activate RM
-    DSC->>+RM: policy Enforcement
-    RM->>-RM: resolve attributes  
-    RM->>+RM: decide
+    DSC->>+RM: enforce
     RM-->>-DSC: pass
-    deactivate RM 
     par
-        activate ADP
         DSC-->>ADP: Accepted
         deactivate ADP
     and
         DSC->>+DSApp: handleActivity
-        DSApp->>+AIG: createVertex(activity.object)
-        AIG-->>DSApp: created
-        deactivate AIG
+        DSApp->>+ADP: fetchDocument
+        ADP-->>DSApp: document
+        deactivate ADP
+        DSApp->>+DM: createDoc(fingerprint,href,target)
+        DM-->>DSApp: created
+        deactivate DM
         DSApp-->>DSC: processed
         deactivate DSApp
    end

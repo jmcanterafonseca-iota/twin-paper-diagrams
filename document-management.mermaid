@@ -6,7 +6,9 @@ sequenceDiagram
     %% Define participants with aliases for cleaner labels
     participant C as Client
     participant DM as Document<br>Management
-    participant DataExt as Data Extraction
+    box rgb(173, 216, 230)
+        participant DataExt as Data Extraction
+    end
     participant AIG as Auditable<br>Item<br>Graph
     participant BS as Blobstore<br>Connector
     participant DLT as DLT Connector

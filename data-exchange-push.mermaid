@@ -1,0 +1,41 @@
+---
+config:
+  theme: default
+---
+sequenceDiagram
+    %% Define participants with aliases for cleaner labels
+    participant C as Data Consumer
+    participant FCAT as Fed Catalogue
+    participant PNP as Policy Negotiation
+    participant RM as Rights Management
+    participant DSC as Data Provider <br>Control Plane
+    participant DSD as Data Provider <br>Data Plane
+    participant ADP as TWIN Adaptor<br>DS App
+    autonumber
+
+    activate C
+    C->>+FCAT: catalog request(query)
+    FCAT-->>-C : matching datasets
+
+    C->>+PNP: Negotiate(Dataset,Offer)
+    activate PNP
+    PNP->>-PNP: verify
+
+    PNP->>+RM: decide
+    RM-->>-PNP: accepted
+    Note left of PNP: Eclipse DSP
+    PNP-->>-C: negotiation Agreement
+
+    C->>+DSC: Request Transfer (Push)
+    Note left of DSC: Eclipse DSP
+    DSC-->>-C: Transfer started
+
+    C->>+DSD: inbox(identity, AS2('Follow', <br>'TransferObject', 'filter'))
+    DSD->>+ADP: subscribeToData(AS2('Follow', <br>'TransferObject', 'filter'))
+    ADP-->>-DSD: subscribed
+    DSD-->>-C: AS2('Accept')
+    Note left of ADP: New data available
+    ADP->>+DSD: outbox(AS2('Create', 'Document'))
+    DSD->>-C: inbox(identity, AS2('Create', 'Document'))
+
+    deactivate C

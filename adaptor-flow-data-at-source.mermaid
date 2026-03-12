@@ -21,8 +21,8 @@ sequenceDiagram
     ADP->>DSC: outbox(identity, <br>AS('Add', 'Document'))
     activate DSC
     DSC->>-DSC: verify
-    DSC->>+RM: enforce
-    RM-->>-DSC: pass
+    DSC->>+RM: enforcePolicy
+    RM-->>-DSC: permit
     par
         DSC-->>ADP: Accepted
         deactivate ADP
@@ -34,7 +34,7 @@ sequenceDiagram
         DSApp->>+DM: createDoc(fingerprint,href,target)
         DM-->>DSApp: created
         deactivate DM
-        DSApp-->>DSC: processed
+        DSApp-->>DSC: activityProcessed
         deactivate DSApp
    end
 

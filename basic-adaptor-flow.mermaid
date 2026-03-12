@@ -23,10 +23,10 @@ sequenceDiagram
     activate DSC
     DSC->>-DSC: verify
     activate RM
-    DSC->>+RM: policy Enforcement
+    DSC->>+RM: enforcePolicy
     RM->>-RM: resolve attributes  
     RM->>+RM: decide
-    RM-->>-DSC: pass
+    RM-->>-DSC: permit
     deactivate RM 
     par
         activate ADP
@@ -37,7 +37,7 @@ sequenceDiagram
         DSApp->>+AIG: createVertex(activity.object)
         AIG-->>DSApp: created
         deactivate AIG
-        DSApp-->>DSC: processed
+        DSApp-->>DSC: activityProcessed
         deactivate DSApp
    end
 

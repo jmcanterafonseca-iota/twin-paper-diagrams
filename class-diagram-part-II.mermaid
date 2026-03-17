@@ -1,0 +1,62 @@
+---
+config:
+  theme: 'neutral'
+---
+
+classDiagram
+    direction BT
+    class DXService["Data Exchange Service"]
+    class FedService["Federation Service"]
+    class DSConnector["DS Connector"] {
+        + registerDSApp(DSApp)
+    }
+    class Dataset {
+        id: String
+        provider: String
+        dataType: String
+        constraint: OdrlConstraint
+    }
+    class FedCat["Federated Catalogue"]
+    class DataApp["Data App"] {
+        packageId: String
+        packageLocation: String
+    }
+    class DSApp["Dataspace App"] {
+        + id: String
+        + activitiesHandled: ActivityQuery
+        + dataSetsHandled: Dataset
+    }
+    class DataService {
+        +endpointURL: String
+    }
+    class DatasetOffer["Dataset Offer"] {
+        dataset: Dataset
+        offerPolicy: OdrlPolicy
+    }
+    class Distribution {
+        +format: String
+    }
+
+    DatasetOffer "1.*" --> FedCat : registered
+
+    Service <|-- VisibilityService
+    Service <|-- DXService
+    Service <|-- FedService
+    DataApp <|-- Adaptor
+    DataApp2 <|-- DSApp
+
+    DXService <.. DSConnector : instance of
+    FedCat ..> FedService : instance of
+    DSConnector --> "1..*" DSApp : delegates on
+    DSApp --> "1..*" Dataset : exposes
+
+
+    Dataset "1" <-- "1..*" DatasetOffer : offers
+    Dataset "1" <-- "1..*" Distribution : distributes
+    Distribution --> DataService : access service
+
+
+
+
+
+

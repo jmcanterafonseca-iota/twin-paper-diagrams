@@ -1,0 +1,14 @@
+ flowchart LR
+    %% Nodes representing Entities (Subjects/Objects)
+    Alice((ex:Alice))
+    Bob((ex:Bob))
+    Person[foaf:Person]
+    Company[schema:Organization]
+    TechCorp((ex:TechCorp))
+    
+    %% Edges representing Relationships (Predicates)
+    Alice -- rdf:type --> Person
+    Alice -- foaf:knows --> Bob
+    Bob -- rdf:type --> Person
+    Bob -- schema:worksFor --> TechCorp
+    TechCorp -- rdf:type --> Company

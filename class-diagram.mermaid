@@ -1,0 +1,113 @@
+---
+config:
+  theme: 'neutral'
+---
+
+classDiagram
+    class DPI["Digital Public Infrastructure"]
+     class Node {
+        + owner : Organization
+        + endpoint 
+    }
+    class Component {
+        + type: String
+        + name: String
+    }
+    class ComponentManager["Component Manager"] {
+        + getComponent(name: String)
+    }
+    class Service ["Component Service"]
+    class Connector["Infra Connector"] {
+        + type: String
+        + name: String
+        + endpoint
+    }
+    class Interface {
+        + name: String
+    }
+    class Method {
+        + signature
+    }
+    class VisibilityService["Visibility Service"]
+    class DXService["Data Exchange Service"]
+    class FedService["Federation Service"]
+    class Adaptor {
+        systemAdapted: String
+        endpoint: String
+    }
+    class DSConnector["DS Connector"] {
+        + registerDSApp(DSApp)
+    }
+    class Dataset {
+        id: String
+        provider: String
+        dataType: String
+        constraint: OdrlConstraint
+    }
+    class FedCat["Federated Catalogue"]
+    class FedCat2["Federated Catalogue"]
+    class DataApp["Data App"] {
+        packageId: String
+        packageLocation: String
+    }
+    class DSApp["Dataspace App"] {
+        + id: String
+        + activitiesHandled: ActivityQuery
+        + dataSetsHandled: Dataset
+    }
+    class DataApp2 ["Data App"] {
+        packageId: String
+        packageLocation: String
+    }
+
+    class DataService {
+        +endpointURL: String
+    }
+    class DatasetOffer["Dataset Offer"] {
+        dataset: Dataset
+        offerPolicy: OdrlPolicy
+    }
+    class RemoteClient["Remote Client"] {
+        endpoint: String
+    }
+    class Distribution {
+        +format: String
+    }
+
+    ComponentManager ..> "1..*" Component : manages
+
+    DatasetOffer "1.*" --> FedCat2 : registered
+
+    %% Relationships
+    DPI *-- "1..*" Node
+    Node  *-- "1..*" Component
+    Component *-- "1..*" Interface : contains
+    Component --> "0..*" Connector : builds on
+    Interface *-- "1..*" Method : defines
+
+    Component <|-- Service
+    Component <|-- Remote Client
+    Component <|-- DataApp
+
+
+    Service <|-- VisibilityService
+    Service <|-- DXService
+    Service <|-- FedService
+    DataApp <|-- Adaptor
+    DataApp2 <|-- DSApp
+
+    DXService <.. DSConnector : instance of
+    FedCat ..> FedService : instance of
+    DSConnector --> "1..*" DSApp : delegates on
+    DSApp --> "1..*" Dataset : exposes
+
+
+    Dataset "1" <-- "1..*" DatasetOffer : offers
+    Dataset "1" <-- "1..*" Distribution : distributes
+    Distribution --> DataService : access service
+
+
+
+
+
+

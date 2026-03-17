@@ -9,6 +9,14 @@ classDiagram
         + owner : Organization
         + endpoint 
     }
+    class BackingService ["Backing Service"] {
+        <<persistence>>
+    }
+     class Connector2["Infra Connector"] {
+        + type: String
+        + name: String
+        + endpoint
+    }
     class Component {
         + type: String
         + name: String
@@ -16,7 +24,9 @@ classDiagram
     class ComponentManager["Component Manager"] {
         + getComponent(name: String)
     }
-    class Service ["Component Service"]
+    class Service ["Component Service"] {
+        restRoute: String
+    }
     class Connector["Infra Connector"] {
         + type: String
         + name: String
@@ -25,7 +35,7 @@ classDiagram
     class Interface {
         + name: String
     }
-    class Method {
+    class Primitive {
         + signature
     }
     class VisibilityService["Visibility Service"]
@@ -38,74 +48,65 @@ classDiagram
     class DSConnector["DS Connector"] {
         + registerDSApp(DSApp)
     }
-    class Dataset {
-        id: String
-        provider: String
-        dataType: String
-        constraint: OdrlConstraint
-    }
+    
     class FedCat["Federated Catalogue"]
-    class FedCat2["Federated Catalogue"]
     class DataApp["Data App"] {
         packageId: String
         packageLocation: String
     }
-    class DSApp["Dataspace App"] {
-        + id: String
-        + activitiesHandled: ActivityQuery
-        + dataSetsHandled: Dataset
-    }
-    class DataApp2 ["Data App"] {
-        packageId: String
-        packageLocation: String
-    }
-
-    class DataService {
-        +endpointURL: String
+    
+    class RemoteClient["Remote Client"] {
+        endpoint: String
     }
     class DatasetOffer["Dataset Offer"] {
         dataset: Dataset
         offerPolicy: OdrlPolicy
     }
-    class RemoteClient["Remote Client"] {
-        endpoint: String
+
+    class DatasetOffer2["Dataset Offer"] {
+        dataset: Dataset
+        offerPolicy: OdrlPolicy
     }
-    class Distribution {
-        +format: String
+
+    class ExternalSystem["Legacy System"] {
+        <<external>>
     }
 
-    ComponentManager ..> "1..*" Component : manages
+    class Solution {
+        <<external>>
+    }
 
-    DatasetOffer "1.*" --> FedCat2 : registered
-
-    %% Relationships
     DPI *-- "1..*" Node
+    ComponentManager ..> "1..*" Component : manages
+    Solution ..> "1..*" Node : uses services
+
+    Connector2  ..> "1" BackingService : wraps
+
+    Node  ..> "1..*" BackingService : uses
+
     Node  *-- "1..*" Component
-    Component *-- "1..*" Interface : contains
-    Component --> "0..*" Connector : builds on
-    Interface *-- "1..*" Method : defines
+    Component --> "1..*" Interface : implements
+    Interface *-- "1..*" Primitive : defines
 
     Component <|-- Service
     Component <|-- Remote Client
     Component <|-- DataApp
-
+    Component --> "0..*" Connector : builds on
 
     Service <|-- VisibilityService
     Service <|-- DXService
     Service <|-- FedService
     DataApp <|-- Adaptor
-    DataApp2 <|-- DSApp
+
+    Adaptor ..> ExternalSystem : adapts
 
     DXService <.. DSConnector : instance of
     FedCat ..> FedService : instance of
-    DSConnector --> "1..*" DSApp : delegates on
-    DSApp --> "1..*" Dataset : exposes
 
+    Node "1" -- "1..*" DatasetOffer2
+    FedCat "1" -- "1..*" DatasetOffer : registered
 
-    Dataset "1" <-- "1..*" DatasetOffer : offers
-    Dataset "1" <-- "1..*" Distribution : distributes
-    Distribution --> DataService : access service
-
+    Node *-- "1" ComponentManager
 
 
 

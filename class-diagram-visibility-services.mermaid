@@ -1,0 +1,62 @@
+---
+config:
+  theme: 'neutral'
+---
+
+classDiagram
+    direction TB
+    class Vertex {
+        +id
+        +dateCreated
+        +dateModified 
+    }
+    class Vertex2["Vertex"] {
+        +id
+        +dateCreated
+        +dateModified
+    }
+    class Annotation {
+        + type
+    }
+    class Edge {
+        +dataCreated
+        +dateModified
+        +targetVertexId
+        +relationshipId
+    }
+    class Alias {
+        +id
+    }
+    class Resource {
+        +id
+        +type
+    }
+    
+    class Changeset {
+        +id
+    }
+    class Patch {
+        patchDetails
+    }
+    class AuditTrail {
+        +id
+    }
+    class TrailRecord {
+        +id
+        +proofValue
+    }
+
+
+    Vertex "1" --> "0..*" Vertex2 : isEdgeTargetOf
+    Vertex "1" --> "0..*" Annotation
+    Vertex "1" -- "1" AuditTrail
+    AuditTrail "1" *-- "0..*" TrailRecord
+    Vertex --> "0..*" Changeset
+    Changeset "1" -- "1" TrailRecord
+    Changeset "1" *-- "1..*" Patch
+    Vertex --> "0..*" Edge
+    Edge "1" --> "0..*" Annotation
+    Vertex "1" --> "0..*" Alias
+    Alias "1" --> "0..*" Annotation
+    Vertex "1" --> "0..*" Resource
+

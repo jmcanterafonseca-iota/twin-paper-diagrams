@@ -6,7 +6,7 @@ config:
 classDiagram
     class DPI["Digital Public Infrastructure"]
      class Node {
-        + owner : Organization
+        + owner : DID
         + endpoint 
     }
     class BackingService ["Backing Service"] {
@@ -72,13 +72,13 @@ classDiagram
         <<external>>
     }
 
-    class Solution {
+    class EcosystemApp ["Ecosystem App"] {
         <<external>>
     }
 
     DPI *-- "1..*" Node
     ComponentManager ..> "1..*" Component : manages
-    Solution ..> "1..*" Node : uses services
+    EcosystemApp ..> "1..*" Node : uses services
 
     Connector2  ..> "1" BackingService : wraps
 
